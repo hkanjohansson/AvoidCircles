@@ -11,12 +11,14 @@ public class MainMenuScreen implements Screen {
     final MyGdxAvoidCircles game;
     OrthographicCamera camera;
     Texture imgMainMenu;
+    Texture imgWelcome;
 
     public MainMenuScreen(MyGdxAvoidCircles game) {
         this.game = game;
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 480);
         imgMainMenu = new Texture("main-menu.png");
+        imgWelcome = new Texture("welcome.png");
     }
 
     @Override
@@ -26,7 +28,8 @@ public class MainMenuScreen implements Screen {
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
         game.batch.begin();
-        game.batch.draw(imgMainMenu, 200, 100);
+        game.batch.draw(imgMainMenu, 150, 10);
+        game.batch.draw(imgWelcome, 120, 250);
         game.batch.end();
 
         if (Gdx.input.isTouched()) {
