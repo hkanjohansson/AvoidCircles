@@ -5,7 +5,10 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.ScreenUtils;
+
+import java.util.Iterator;
 
 public class MyGdxAvoidCircles extends Game {
 
@@ -30,4 +33,6 @@ public class MyGdxAvoidCircles extends Game {
 		batch.dispose();
 		font.dispose();
 	}
+
+
 }
