@@ -25,7 +25,7 @@ public class GameScreen implements Screen {
     Rectangle player;
     Array<Rectangle> enemies;
     long lastEnemySpawn;
-    int enemyDirection;
+    float deltaTime;
 
     public GameScreen(MyGdxAvoidCircles game) {
         this.game = game;
@@ -43,49 +43,38 @@ public class GameScreen implements Screen {
         player.width = 64;
         player.height = 64;
 
-        enemyDirection = 0;
         enemies = new Array<>();
         spawnEnemy();
 
         lastEnemySpawn = 0;
+        deltaTime = 0;
     }
 
     private void spawnEnemy() {
         Rectangle enemy = new Rectangle();
-        enemyDirection = MathUtils.random(4);
-        System.out.println("Hej1");
-        switch (enemyDirection) {
+        int enemyDirection = MathUtils.random(4); // TODO - Assign direction value to the enemy objects
+        enemy.setSize(enemyDirection);
 
 
-            case 0:
-                // top
 
-                enemy.x = MathUtils.random(0, 800 - 32);
-                System.out.println("Hej2: " + enemy.x);
-                enemy.y = 0;
-                break;
+        if (enemyDirection == 0) {
+            enemy.x = MathUtils.random(0, 800 - 32);
+            enemy.y = 0;
+        }
 
-            case 1:
-                // bottom
-                enemy.x = MathUtils.random(0, 800 - 32);
-                System.out.println("Hej3: " + enemy.x);
-                enemy.y = 480;
-                break;
+        if (enemyDirection == 1) {
+            enemy.x = MathUtils.random(0, 800 - 32);
+            enemy.y = 480;
+        }
 
-            case 2:
-                // left
-                enemy.x = 0;
-                enemy.y = MathUtils.random(0, 480 - 32);
-                System.out.println("Hej4: " + enemy.y);
-                break;
+        if (enemyDirection == 2) {
+            enemy.y = MathUtils.random(0, 480 - 32);
+            enemy.x = 0;
+        }
 
-            case 3:
-                // right
-                enemy.x = 800;
-                enemy.y = MathUtils.random(0, 480 - 32);
-                System.out.println("Hej5: " + enemy.y);
-                break;
-
+        if (enemyDirection == 3) {
+            enemy.y = MathUtils.random(0, 480 - 32);
+            enemy.x = 800;
         }
 
         enemy.width = 32;
@@ -145,7 +134,7 @@ public class GameScreen implements Screen {
         if (player.y > 480 - 64)
             player.y = 480 - 64;
 
-        // check if we need to create a new raindrop
+        // check if we need to create a new enemy
         if (TimeUtils.nanoTime() - lastEnemySpawn > 1000000000)
             spawnEnemy();
 
@@ -155,42 +144,23 @@ public class GameScreen implements Screen {
         Iterator<Rectangle> iter = enemies.iterator();
         while (iter.hasNext()) {
             Rectangle enemy = iter.next();
-            //enemy.x += Gdx.graphics.getDeltaTime();
-            switch (enemyDirection) {
-                case 0:
-                    // top
-                    enemy.y -= 200 * Gdx.graphics.getDeltaTime();
-                    if (enemy.y + 32 < 0)
-                        iter.remove();
-                    break;
+            deltaTime = 200 * Gdx.graphics.getDeltaTime();
 
-
-                case 1:
-                    // bottom
-
-                    enemy.y += 200 * Gdx.graphics.getDeltaTime();
-                    if (enemy.y - 32 > 480)
-                        iter.remove();
-                    break;
-
-                case 2:
-                    // left
-                    System.out.println(enemyDirection);
-                    enemy.x += 200 * Gdx.graphics.getDeltaTime();
-                    if (enemy.x - 32 < 0)
-                        iter.remove();
-                    break;
-
-                case 3:
-                    // right
-                    System.out.println(enemyDirection);
-                    enemy.x -= 200 * Gdx.graphics.getDeltaTime();
-                    if (enemy.x + 32 > 800)
-                        iter.remove();
-                    break;
-
+            if (enemy.x - deltaTime < 0) {
+                iter.remove();
             }
 
+            if (enemy.x + deltaTime > 800) {
+                iter.remove();
+            }
+
+            if (enemy.y - deltaTime < 0) {
+                iter.remove();
+            }
+
+            if (enemy.y + deltaTime > 480) {
+                iter.remove();
+            }
             //enemy.y -= 200 * Gdx.graphics.getDeltaTime(); // TODO - Check which direction the enemies are coming from
         }
     }
@@ -222,6 +192,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void dispose() {
-
+        playerImage.dispose();
+        enemyImage.dispose();
     }
 }
