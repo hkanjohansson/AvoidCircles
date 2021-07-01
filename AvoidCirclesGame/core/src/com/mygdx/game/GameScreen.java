@@ -24,8 +24,9 @@ public class GameScreen implements Screen {
     OrthographicCamera camera;
     Rectangle player;
     Array<Rectangle> enemies;
+    Array<Integer> enemiesDirections;
     long lastEnemySpawn;
-    float deltaTime;
+    float deltaTimeDist;
 
     public GameScreen(MyGdxAvoidCircles game) {
         this.game = game;
@@ -44,27 +45,28 @@ public class GameScreen implements Screen {
         player.height = 64;
 
         enemies = new Array<>();
+        enemiesDirections = new Array<>();
         spawnEnemy();
 
         lastEnemySpawn = 0;
-        deltaTime = 0;
+        deltaTimeDist = 0;
     }
 
     private void spawnEnemy() {
         Rectangle enemy = new Rectangle();
-        int enemyDirection = MathUtils.random(4); // TODO - Assign direction value to the enemy objects
-        enemy.setSize(enemyDirection);
+        enemy.width = 32;
+        enemy.height = 32;
 
-
-
+        int enemyDirection = MathUtils.random(4);
+        enemiesDirections.add(enemyDirection);
         if (enemyDirection == 0) {
             enemy.x = MathUtils.random(0, 800 - 32);
-            enemy.y = 0;
+            enemy.y = 480;
         }
 
         if (enemyDirection == 1) {
             enemy.x = MathUtils.random(0, 800 - 32);
-            enemy.y = 480;
+            enemy.y = 0;
         }
 
         if (enemyDirection == 2) {
@@ -77,9 +79,8 @@ public class GameScreen implements Screen {
             enemy.x = 800;
         }
 
-        enemy.width = 32;
-        enemy.height = 32;
         enemies.add(enemy);
+
         lastEnemySpawn = TimeUtils.nanoTime();
 
     }
@@ -135,32 +136,71 @@ public class GameScreen implements Screen {
             player.y = 480 - 64;
 
         // check if we need to create a new enemy
-        if (TimeUtils.nanoTime() - lastEnemySpawn > 1000000000)
+        if (TimeUtils.nanoTime() - lastEnemySpawn > 2000000000){
             spawnEnemy();
+        }
+
 
         // move the raindrops, remove any that are beneath the bottom edge of
         // the screen or that hit the bucket. In the later case we play back
         // a sound effect as well.
         Iterator<Rectangle> iter = enemies.iterator();
-        while (iter.hasNext()) {
+        Iterator<Integer> iterDirections = enemiesDirections.iterator();
+        while (iter.hasNext() && iterDirections.hasNext()) {
             Rectangle enemy = iter.next();
-            deltaTime = 200 * Gdx.graphics.getDeltaTime();
+            int enemyDirection = iterDirections.next(); // TODO - Assign direction value to the enemy objects
 
-            if (enemy.x - deltaTime < 0) {
-                iter.remove();
+            System.out.println("Enemy direction: " + enemyDirection);
+
+
+            deltaTimeDist = 200 * Gdx.graphics.getDeltaTime();
+            scoreTime += Gdx.graphics.getDeltaTime();
+
+            // TODO - Move in assigned direction
+            if (enemyDirection == 0) {
+                enemy.y -= deltaTimeDist;
             }
 
-            if (enemy.x + deltaTime > 800) {
-                iter.remove();
+            if (enemyDirection == 1) {
+                enemy.y += deltaTimeDist;
             }
 
-            if (enemy.y - deltaTime < 0) {
-                iter.remove();
+
+            if (enemyDirection == 2) {
+                enemy.x += deltaTimeDist;
             }
 
-            if (enemy.y + deltaTime > 480) {
-                iter.remove();
+
+            if (enemyDirection == 3) {
+                enemy.x -= deltaTimeDist;
             }
+
+            // TODO - Check if on screen
+            if (enemy.y < 0 && enemyDirection == 0) {
+                iter.remove();
+                iterDirections.remove();
+                System.out.println("Enemy removed 1");
+            }
+
+            if (enemy.y > 480 && enemyDirection == 1) {
+                iter.remove();
+                iterDirections.remove();
+                System.out.println("Enemy removed 2");
+            }
+
+            if (enemy.x < 0 && enemyDirection == 2) {
+                iter.remove();
+                iterDirections.remove();
+                System.out.println("Enemy removed 3");
+            }
+
+            if (enemy.x > 800 && enemyDirection == 3) {
+                iter.remove();
+                iterDirections.remove();
+                System.out.println("Enemy removed 4");
+            }
+
+
             //enemy.y -= 200 * Gdx.graphics.getDeltaTime(); // TODO - Check which direction the enemies are coming from
         }
     }
