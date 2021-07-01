@@ -19,8 +19,8 @@ public class GameScreen implements Screen {
     final MyGdxAvoidCircles game;
     Texture playerImage;
     Texture enemyImage;
-    Timer timer;
-    int scoreTime;
+    long startTime;
+    float scoreTime;
     OrthographicCamera camera;
     Rectangle player;
     Array<Rectangle> enemies;
@@ -50,6 +50,9 @@ public class GameScreen implements Screen {
 
         lastEnemySpawn = 0;
         deltaTimeDist = 0;
+
+        scoreTime = 0;
+        startTime = TimeUtils.millis();
     }
 
     private void spawnEnemy() {
@@ -146,6 +149,8 @@ public class GameScreen implements Screen {
         // a sound effect as well.
         Iterator<Rectangle> iter = enemies.iterator();
         Iterator<Integer> iterDirections = enemiesDirections.iterator();
+
+        float tempTime = 0;
         while (iter.hasNext() && iterDirections.hasNext()) {
             Rectangle enemy = iter.next();
             int enemyDirection = iterDirections.next(); // TODO - Assign direction value to the enemy objects
@@ -154,7 +159,7 @@ public class GameScreen implements Screen {
 
 
             deltaTimeDist = 200 * Gdx.graphics.getDeltaTime();
-            scoreTime += Gdx.graphics.getDeltaTime();
+
 
             // TODO - Move in assigned direction
             if (enemyDirection == 0) {
@@ -179,25 +184,30 @@ public class GameScreen implements Screen {
             if (enemy.y < 0 && enemyDirection == 0) {
                 iter.remove();
                 iterDirections.remove();
-                System.out.println("Enemy removed 1");
             }
 
             if (enemy.y > 480 && enemyDirection == 1) {
                 iter.remove();
                 iterDirections.remove();
-                System.out.println("Enemy removed 2");
             }
 
             if (enemy.x < 0 && enemyDirection == 2) {
                 iter.remove();
                 iterDirections.remove();
-                System.out.println("Enemy removed 3");
             }
 
             if (enemy.x > 800 && enemyDirection == 3) {
                 iter.remove();
                 iterDirections.remove();
-                System.out.println("Enemy removed 4");
+            }
+
+            if (!enemy.overlaps(player)) {
+                //scoreTime += (TimeUtils.timeSinceMillis(startTime))/1000;
+                scoreTime += Gdx.graphics.getDeltaTime();
+                tempTime += Gdx.graphics.getDeltaTime();
+                System.out.println(tempTime);
+            } else {
+                System.exit(-1);
             }
 
 
