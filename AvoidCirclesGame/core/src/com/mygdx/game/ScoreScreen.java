@@ -1,10 +1,7 @@
 package com.mygdx.game;
 
-import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 public class ScoreScreen implements Screen {
@@ -12,14 +9,16 @@ public class ScoreScreen implements Screen {
     final MyGdxAvoidCircles game;
     OrthographicCamera camera;
     Screen gameScreen;
-    float score;
+    int score;
+    int level;
+
     public ScoreScreen(MyGdxAvoidCircles game) {
         this.game = game;
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 480);
         gameScreen = game.getScreen();
-        score = ((GameScreen) gameScreen).scoreTime;
-
+        score = ((GameScreen) gameScreen).score;
+        level = ((GameScreen) gameScreen).level;
     }
 
 
@@ -29,10 +28,10 @@ public class ScoreScreen implements Screen {
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
         game.batch.begin();
-        game.font.draw(game.batch, "This is your score: " + score + "s", 200, 400);
+        game.font.draw(game.batch, "You reached level: " + level + " and", 200, 400);
+        game.font.draw(game.batch, "this is your total score: " + score + " points", 200, 350);
         game.font.draw(game.batch, "THANKS FOR PLAYING!", 200, 300);
         game.batch.end();
-
     }
 
     @Override

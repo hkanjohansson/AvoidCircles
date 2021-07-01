@@ -18,7 +18,9 @@ public class GameScreen implements Screen {
     final MyGdxAvoidCircles game;
     Texture playerImage;
     Texture enemyImage;
-    float scoreTime;
+    int numberOfEnemies;
+    int level;
+    int score;
     OrthographicCamera camera;
     Rectangle player;
     Array<Rectangle> enemies;
@@ -50,7 +52,10 @@ public class GameScreen implements Screen {
         lastEnemySpawn = 0;
         deltaTimeDist = 0;
 
-        scoreTime = 0;
+        // These fields makes the scoring system
+        numberOfEnemies = 0;
+        level = 1;
+        score = 0;
 
     }
 
@@ -82,6 +87,11 @@ public class GameScreen implements Screen {
         }
 
         enemies.add(enemy);
+        score += level;
+
+        if (score % 10 == 0) {
+            level++;
+        }
 
         lastEnemySpawn = TimeUtils.nanoTime();
 
@@ -90,6 +100,8 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
+
+
         ScreenUtils.clear(1, 1, 1, 1);
         // clear the screen with a dark blue color. The
         // arguments to clear are the red, green
@@ -107,7 +119,7 @@ public class GameScreen implements Screen {
         // begin a new batch and draw the bucket and
         // all drops
         game.batch.begin();
-        game.font.draw(game.batch, "Score: " + scoreTime + " seconds", 0, 480);
+        game.font.draw(game.batch, "Score: " + score + " points, " + "Level: " + level, 0, 480);
         game.font.setColor(0, 0, 0, 1);
         game.batch.draw(playerImage, player.x, player.y);
 
@@ -137,8 +149,9 @@ public class GameScreen implements Screen {
         if (player.y > 480 - 64)
             player.y = 480 - 64;
 
-        // check if we need to create a new enemy
-        if (TimeUtils.nanoTime() - lastEnemySpawn > 2000000000) {
+        // Check if we need to create a new enemy
+        // The speed for enemy spawns will increase continously
+        if (TimeUtils.nanoTime() - lastEnemySpawn > 1000000000) {
             spawnEnemy();
         }
 
@@ -153,8 +166,7 @@ public class GameScreen implements Screen {
             Rectangle enemy = iter.next();
             int enemyDirection = iterDirections.next();
 
-            System.out.println("Enemy direction: " + enemyDirection);
-            deltaTimeDist = 200 * Gdx.graphics.getDeltaTime();
+            deltaTimeDist = (200 + score) * Gdx.graphics.getDeltaTime();
 
             if (enemyDirection == 0) {
                 enemy.y -= deltaTimeDist;
@@ -194,9 +206,9 @@ public class GameScreen implements Screen {
                 iterDirections.remove();
             }
 
-            if (!enemy.overlaps(player)) {
-                scoreTime += Gdx.graphics.getDeltaTime();
-            } else {
+            if (enemy.overlaps(player)) { // TODO - Clean this code -> Check if overlap -> then set scorescreen
+                //score += Gdx.graphics.getDeltaTime();
+
                 scoreScreen = new ScoreScreen(game);
                 game.setScreen(scoreScreen);
             }
