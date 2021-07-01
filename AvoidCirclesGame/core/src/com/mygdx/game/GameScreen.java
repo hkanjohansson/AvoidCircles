@@ -10,7 +10,6 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.badlogic.gdx.utils.Timer;
 
 import java.util.Iterator;
 
@@ -19,7 +18,6 @@ public class GameScreen implements Screen {
     final MyGdxAvoidCircles game;
     Texture playerImage;
     Texture enemyImage;
-    long startTime;
     float scoreTime;
     OrthographicCamera camera;
     Rectangle player;
@@ -27,6 +25,7 @@ public class GameScreen implements Screen {
     Array<Integer> enemiesDirections;
     long lastEnemySpawn;
     float deltaTimeDist;
+    ScoreScreen scoreScreen;
 
     public GameScreen(MyGdxAvoidCircles game) {
         this.game = game;
@@ -52,7 +51,7 @@ public class GameScreen implements Screen {
         deltaTimeDist = 0;
 
         scoreTime = 0;
-        startTime = TimeUtils.millis();
+
     }
 
     private void spawnEnemy() {
@@ -139,7 +138,7 @@ public class GameScreen implements Screen {
             player.y = 480 - 64;
 
         // check if we need to create a new enemy
-        if (TimeUtils.nanoTime() - lastEnemySpawn > 2000000000){
+        if (TimeUtils.nanoTime() - lastEnemySpawn > 2000000000) {
             spawnEnemy();
         }
 
@@ -150,18 +149,13 @@ public class GameScreen implements Screen {
         Iterator<Rectangle> iter = enemies.iterator();
         Iterator<Integer> iterDirections = enemiesDirections.iterator();
 
-        float tempTime = 0;
         while (iter.hasNext() && iterDirections.hasNext()) {
             Rectangle enemy = iter.next();
-            int enemyDirection = iterDirections.next(); // TODO - Assign direction value to the enemy objects
+            int enemyDirection = iterDirections.next();
 
             System.out.println("Enemy direction: " + enemyDirection);
-
-
             deltaTimeDist = 200 * Gdx.graphics.getDeltaTime();
 
-
-            // TODO - Move in assigned direction
             if (enemyDirection == 0) {
                 enemy.y -= deltaTimeDist;
             }
@@ -180,7 +174,6 @@ public class GameScreen implements Screen {
                 enemy.x -= deltaTimeDist;
             }
 
-            // TODO - Check if on screen
             if (enemy.y < 0 && enemyDirection == 0) {
                 iter.remove();
                 iterDirections.remove();
@@ -202,16 +195,11 @@ public class GameScreen implements Screen {
             }
 
             if (!enemy.overlaps(player)) {
-                //scoreTime += (TimeUtils.timeSinceMillis(startTime))/1000;
                 scoreTime += Gdx.graphics.getDeltaTime();
-                tempTime += Gdx.graphics.getDeltaTime();
-                System.out.println(tempTime);
             } else {
-                System.exit(-1);
+                scoreScreen = new ScoreScreen(game);
+                game.setScreen(scoreScreen);
             }
-
-
-            //enemy.y -= 200 * Gdx.graphics.getDeltaTime(); // TODO - Check which direction the enemies are coming from
         }
     }
 
@@ -245,4 +233,5 @@ public class GameScreen implements Screen {
         playerImage.dispose();
         enemyImage.dispose();
     }
+
 }
